@@ -3,81 +3,34 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:assistente_mecanico_poc/detail.dart';
 import 'page.dart';
+import 'package:location/location.dart';
 
-//void main() => runApp(MaterialApp(title: 'home', home: MapButtonStateLess()));
-String id = "default";
+const LatLng _center = const LatLng(-19.920330, -43.920736);
+LatLng current = _center;
 
 class MapButtonPage extends Page {
   MapButtonPage() : super(const Icon(Icons.place), 'Map Button');
 
   @override
   Widget build(BuildContext context) {
+    _getLocation();
     return MapButtonStateLess();
+  }
+
+  _getLocation() async {
+    var location = new Location();
+    try {
+      await location.getLocation();
+    } on Exception {}
+    location.onLocationChanged().listen((LocationData currentLocation) {
+      current = LatLng(currentLocation.latitude, currentLocation.longitude);
+    });
   }
 }
 
 class MapButtonStateLess extends StatelessWidget {
-//  @override
-//  Widget build(BuildContext context) {
-//    final List<Widget> columnChildren = <Widget>[
-//      Padding(
-//        padding: const EdgeInsets.all(10.0),
-//        child: Center(
-//          child: SizedBox(
-//            height: 500.0,
-//            child: MapButtonStateful(),
-//          ),
-//        ),
-//      ),
-//    ];
-//    columnChildren.add(Center(
-//        child: RaisedButton(
-//      onPressed: () {
-//        Navigator.push(
-//          context,
-//          MaterialPageRoute(builder: (context) => Detail(title: id)),
-//        );
-//      },
-//      shape: RoundedRectangleBorder(
-//          borderRadius: BorderRadius.all(Radius.circular(10))),
-//      color: Colors.redAccent,
-//      child: const Text('Abrir', style: TextStyle(fontSize: 20)),
-//    )));
-//    return Scaffold(
-//      body: Column(
-//        mainAxisAlignment: MainAxisAlignment.start,
-//        crossAxisAlignment: CrossAxisAlignment.stretch,
-//        children: columnChildren,
-//      ),
-//    );
-//  }
-
   @override
   Widget build(BuildContext context) {
-    final List<Widget> columnChildren = <Widget>[
-      Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Center(
-          child: SizedBox(
-            height: 500.0,
-            child: MapButtonStateful(),
-          ),
-        ),
-      ),
-    ];
-    columnChildren.add(Center(
-        child: RaisedButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => Detail(title: id)),
-        );
-      },
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10))),
-      color: Colors.redAccent,
-      child: const Text('Abrir', style: TextStyle(fontSize: 20)),
-    )));
     return Scaffold(
       body: MapButtonStateful(),
     );
@@ -92,8 +45,6 @@ class MapButtonStateful extends StatefulWidget {
 class _MapButtonState extends State<MapButtonStateful> {
   Completer<GoogleMapController> _controller = Completer();
 
-  static const LatLng _center = const LatLng(-19.920330, -43.920736);
-
   void _onMapCreated(GoogleMapController controller) {
     _controller.complete(controller);
   }
@@ -102,9 +53,12 @@ class _MapButtonState extends State<MapButtonStateful> {
   Widget build(BuildContext context) {
     final GoogleMap map = GoogleMap(
         onMapCreated: _onMapCreated,
+        myLocationEnabled: true,
+        compassEnabled: true,
+        indoorViewEnabled: true,
         markers: createMarkers(),
         initialCameraPosition: CameraPosition(
-          target: _center,
+          target: current,
           zoom: 16.0,
         ));
     return map;
@@ -142,32 +96,30 @@ class _MapButtonState extends State<MapButtonStateful> {
     return markers;
   }
 
-  onTapMarker(String title) {
-    id = title;
-  }
-
   void _modalButtomSheet(BuildContext context, String title) {
     showModalBottomSheet(
         context: context,
-        builder: (BuildContext bc){
+        builder: (BuildContext bc) {
           return Container(
             child: new Wrap(
               children: <Widget>[
                 new ListTile(
-                    leading: new Icon(Icons.store),
+                    leading: new Icon(
+                      Icons.store,
+                      color: Theme.of(context).primaryColor,
+                    ),
                     title: new Text(title),
-                    onTap: (){
+                    contentPadding: EdgeInsets.only(bottom: 20, left: 15),
+                    onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                        builder: (context) => Detail(title: title)),
+                            builder: (context) => Detail(title: title)),
                       );
-                    }
-                ),
+                    }),
               ],
             ),
           );
-        }
-    );
+        });
   }
 }

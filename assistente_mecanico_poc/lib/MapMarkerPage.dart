@@ -18,8 +18,7 @@ class MapMarkerPage extends Page {
 class MapMarkerStateLess extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: MapMarkerStateful());
+    return Scaffold(body: MapMarkerStateful());
   }
 }
 

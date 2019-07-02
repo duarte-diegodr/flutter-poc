@@ -28,6 +28,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   google_maps_flutter: ^0.5.19
+  location: ^2.3.5
 #      path: ../packages/google_maps_flutter
 
 

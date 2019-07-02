@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 class Detail extends StatelessWidget {
   Detail({
     this.title,
@@ -12,7 +13,7 @@ class Detail extends StatelessWidget {
       ),
       body: Center(
         child: Text(this.title),
-        ),
+      ),
     );
   }
 }
